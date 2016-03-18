@@ -43,6 +43,9 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    self.animationView.frame = CGRectMake(100, 100, 100, 100);
+    [self.view addSubview:self.animationView];
+    
 //    self.animationLayer.position = self.view.center;
 //    self.animationLayer.bounds = CGRectMake(0, 0, 150, 150);
 //    self.animationLayer.delegate = self;
@@ -74,6 +77,37 @@
     layer.contents = (id)[UIImage imageNamed:@"app_icon"].CGImage;
     [self.view.layer addSublayer:layer];
     self.layer = layer;
+    
+}
+
+- (void)keyframeTranslatonAnimation_1 {
+    CAKeyframeAnimation *keyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    
+    NSValue *key1=[NSValue valueWithCGPoint:_layer.position];//对于关键帧动画初始值不能省略
+    NSValue *key2=[NSValue valueWithCGPoint:CGPointMake(80, 220)];
+    NSValue *key3=[NSValue valueWithCGPoint:CGPointMake(45, 300)];
+    NSValue *key4=[NSValue valueWithCGPoint:CGPointMake(55, 400)];
+    NSArray *values=@[key1,key2,key3,key4];
+    keyframeAnimation.values = values;
+    
+    keyframeAnimation.duration = 5;
+    keyframeAnimation.beginTime = CACurrentMediaTime() + 2; //延迟2秒执行
+    [self.layer addAnimation:keyframeAnimation forKey:@"keyframeTranslatonAnimation_1"];
+}
+
+- (void)keyframeTranslatonAnimation_2 {
+    CAKeyframeAnimation *keyframeanimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, nil, self.layer.position.x, self.layer.position.y);
+    CGPathAddCurveToPoint(path, nil, 160, 280, -30, 300, 55, 400);
+    
+    keyframeanimation.path = path;
+    
+    CGPathRelease(path);
+    keyframeanimation.duration = 6;
+    keyframeanimation.beginTime = CACurrentMediaTime() + 2;
+    [self.layer addAnimation:keyframeanimation forKey:@"keyframeTranslatonAnimation_2"];
+    
 }
 
 //平移动画
@@ -118,10 +152,19 @@
 //    self.animationLayer.bounds = CGRectMake(0, 0, 300, 300);
     UITouch *touch = touches.anyObject;
     CGPoint location= [touch locationInView:self.view];
-    
-    [self translatonAnimation:location];
-    
-    [self rotationAnimation];
+//
+//    [self translatonAnimation:location];
+//    
+//    [self rotationAnimation];
+    /*创建弹性动画
+     damping:阻尼，范围0-1，阻尼越接近于0，弹性效果越明显
+     velocity:弹性复位的速度
+     */
+    [UIView animateWithDuration:5 delay:0 usingSpringWithDamping:0.2 initialSpringVelocity:10 options:UIViewAnimationOptionCurveLinear animations:^{
+        self.animationView.center = location;
+    } completion:^(BOOL finished) {
+        
+    }];
 }
 
 #pragma mark = animation delegate
